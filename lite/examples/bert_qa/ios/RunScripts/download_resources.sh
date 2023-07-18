@@ -69,3 +69,6 @@ fi
 
 echo "INFO: All resources are prepared."
 
+echo "INFO: Now encrypting resources"
+
+openssl enc -aes-256-cbc -nosalt -in "${MODEL_PATH}" -out "${MODEL_PATH}.aes" -kfile ./RunScripts/encryption_key.txt -p -iv 0

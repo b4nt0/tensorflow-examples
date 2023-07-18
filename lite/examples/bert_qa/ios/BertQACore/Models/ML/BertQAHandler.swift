@@ -22,6 +22,7 @@ final class BertQAHandler {
 
   private let dic: [String: Int32]
   private let tokenizer: FullTokenizer
+  private var interpreterData: Data
 
   init(
     with modelFile: File = MobileBERT.model,
@@ -35,21 +36,17 @@ final class BertQAHandler {
     // Initialize `FullTokenizer` with given `dic`.
     tokenizer = FullTokenizer(with: dic, isCaseInsensitive: MobileBERT.doLowerCase)
 
-    // Construct the path to the model file.
-    guard
-      let modelPath = Bundle(for: type(of: self)).path(
-        forResource: modelFile.name,
-        ofType: modelFile.ext)
-    else {
-      fatalError("Failed to load the model file: \(modelFile.description)")
-    }
-
     // Specify the options for the `Interpreter`.
     var options = Interpreter.Options()
     options.threadCount = threadCount
+      
+    self.interpreterData = readEncryptedFile(fileName: modelFile.name + "." + modelFile.ext + ".aes",                                 decryptionKey: "5C540A8318E5C1931940C2D7334BF71BF712F86726629C5BE7886C643D29AED6")!
+      
 
     // Create the `Interpreter`.
-    interpreter = try Interpreter(modelPath: modelPath, options: options)
+    // interpreter = try Interpreter(modelPath: modelPath, options: options)
+      
+    interpreter = try Interpreter(modelData: self.interpreterData, options: options)
 
     // Initialize input and output `Tensor`s.
     try interpreter.allocateTensors()
